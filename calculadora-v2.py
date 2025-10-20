@@ -27,6 +27,12 @@ win.geometry(f"+{posX}+{posY}")
 numbers = Frame(win)
 numbers.pack(side="bottom")
 
+expscreen = Frame(win)
+expscreen.pack(side="top", anchor="w")
+
+numscreen = Frame(win)
+numscreen.pack(side="top", anchor="e")
+
 screen = Frame(win)
 screen.pack(side="top")
 
@@ -34,152 +40,78 @@ screen.pack(side="top")
 
 # def areas
 
-def bigwich(x, y):
-    if x < y:
-        return x
-    elif y < x:
-        return y
-    else:
-        return x
-
 
 def addscreen(num):
-    global decinum, decicount
-    currentnum = displaynum.cget("text")
-    if not decinum:
-        displaynum.config(text=currentnum * 10 + (num))
-    elif decinum:
-        displaynum.config(
-            text=round(currentnum + (num * 10**decicount), abs(decicount))
-        )
-        decicount -= 1
-
-
-def adddeci():
-    global decinum, decicount
-    if decinum:
-        pass
-    else:
-        currentnum = displaynum.cget("text")
-        displaynum.config(text=float(currentnum))
-        decinum = True
-
-
-def metplus():
-    global memorynum, metchoice, decinum, decicount, decimem
-    memorynum += displaynum.cget("text")
-    metchoice = "+"
-    decinum = False
-    decimem = decicount
-    decicount = -1
-    displaynum.config(text=0)
-
-
-def metminus():
-    global memorynum, metchoice, decinum, decicount, decimem
-    memorynum = displaynum.cget("text") - memorynum
-    metchoice = "-"
-    decinum = False
-    decimem = decicount
-    decicount = -1
-    displaynum.config(text=0)
-
-
-def metmulti():
-    global memorynum, metchoice, decinum, decicount, decimem
-    if memorynum == 0:
-        memorynum = (memorynum + 1) * displaynum.cget("text")
-    else:
-        memorynum = (memorynum) * displaynum.cget("text")
-    metchoice = "*"
-    decinum = False
-    decimem = decicount
-    decicount = -1
-    displaynum.config(text=0)
-
-
-def metdiv():
-    global memorynum, metchoice, decinum, decicount, decimem
-    if memorynum == 0:
-        memorynum = displaynum.cget("text") / (memorynum + 1)
-    else:
-        memorynum = displaynum.cget("text") / memorynum
-    metchoice = "/"
-    decinum = False
-    decimem = decicount
-    decicount = -1
-    displaynum.config(text=0)
+    global expnum, firstresult
+    if not firstresult:
+        expnum.append(str(num))
+        displayexpnum.config(text="".join(expnum))
+    if firstresult:
+        if num in [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, "(", ")"]:
+            pass
+        else:
+            expnum = [str(memorynum)]
+            expnum.extend(str(num))
+            displayexpnum.config(text="".join(expnum))
+            firstresult = False
 
 
 def result():
-    global memorynum, metchoice, decinum, decicount, decimem
-    currentnum = displaynum.cget("text")
-    if metchoice == "+":
-        displaynum.config(
-            text=round(
-                float(currentnum) + float(memorynum), abs(bigwich(decicount, decimem))
-            )
-        )
-    elif metchoice == "-":
-        displaynum.config(
-            text=round(
-                float(memorynum) - float(currentnum), abs(bigwich(decicount, decimem))
-            )
-        )
-    elif metchoice == "*":
-        displaynum.config(
-            text=round(
-                float(memorynum) * float(currentnum), abs(bigwich(decicount, decimem))
-            )
-        )
-    elif metchoice == "/":
-        if currentnum == 0:
-            displaynum.config(text="Erro..")
-        else:
-            displaynum.config(
-                text=round(
-                    float(memorynum) / float(currentnum),
-                    abs(bigwich(decicount, decimem)),
-                )
-            )
-    memorynum = 0
-    metchoice = ""
-    decinum = False
-    decimem = 0
-    decicount = -1
+    global expnum, displaynum, finalnum, memorynum, firstresult
+    currentnum = str(("".join(expnum)))
+    currentnum = currentnum.replace("x", "*").replace("÷", "/")
+    displaynum.config(text=(round(eval(currentnum), 5)))
+    memorynum = displaynum.cget("text")
+    firstresult = True
 
 
 def clear():
-    global memorynum, metchoice, decinum, decicount
-    memorynum = 0
-    metchoice = ""
-    decinum = False
-    decicount = -1
+    global expnum, displayexpnum, finalnum, firstresult
+    expnum = []
+    finalnum = 0
+    displayexpnum.config(text="")
     displaynum.config(text=0)
+    firstresult = False
+
+
+def delete():
+    global expnum, displayexpnum
+    last_element = expnum[-1]
+    expnum.remove(last_element)
+    displayexpnum.config(text="".join(expnum))
 
 
 # screen number
-num = StringVar()
-num = 0
 
-decinum = False
-decicount = -1
-decimem = 0
+finalnum = 0
 
-metchoice = ""
+expnum = []
+
+
 memorynum = 0
 
+firstresult = False
 
-# fram SCREEN_NUM
+
+# frame SCREEN_NUM
+
+displayexpnum = Label(
+    expscreen,
+    text=expnum,
+    bg="black",
+    fg="white",
+    font=("Arial", 40),
+)
+displayexpnum.pack()
 
 displaynum = Label(
-    win,
-    text=num,
+    numscreen,
+    text=finalnum,
     bg="black",
     fg="white",
     font=("Arial", 50),
 )
-displaynum.pack(side="right")
+displaynum.pack()
 
 
 # frame NUMBERS
@@ -194,6 +126,26 @@ butt0 = Button(
     fg="white",
     command=lambda: addscreen(0),
 )
+
+"""
+def ButtonCreator(x, y):
+    for i in range(x, y):
+        name = "butt" + str(i)
+        globals()[name] = Button(
+            numbers,
+            text="%s" % (i),
+            width=5,
+            height=2,
+            font=("Arial", 25),
+            bg="#333333",
+            fg="White",
+            command=lambda digit=i: addscreen(digit),
+        )
+
+
+ButtonCreator(1, 10)
+"""
+
 butt1 = Button(
     numbers,
     text="1",
@@ -284,6 +236,28 @@ butt9 = Button(
     fg="white",
     command=lambda: addscreen(9),
 )
+
+
+"""
+def ButtonCreatorlist(nums, names):
+    for i, j in zip(nums, names):
+        name = "butt" + str(j)
+        globals()[name] = Button(
+            numbers,
+            text="%s" % (i),
+            width=5,
+            height=2,
+            font=("Arial", 25),
+            bg="#fe9504",
+            fg="White",
+            command=lambda digit=i: addscreen(digit),
+        )
+
+
+simbs = ["+", "-", "x", "÷"]
+names = ["plus", "minus", "multi", "div"]
+ButtonCreatorlist(simbs, names)
+"""
 buttplus = Button(
     numbers,
     text="+",
@@ -292,7 +266,7 @@ buttplus = Button(
     font=("Arial", 25),
     bg="#fe9504",
     fg="white",
-    command=lambda: metplus(),
+    command=lambda: addscreen("+"),
 )
 buttminus = Button(
     numbers,
@@ -302,7 +276,7 @@ buttminus = Button(
     font=("Arial", 25),
     bg="#fe9504",
     fg="white",
-    command=lambda: metminus(),
+    command=lambda: addscreen("-"),
 )
 buttmulti = Button(
     numbers,
@@ -312,7 +286,7 @@ buttmulti = Button(
     font=("Arial", 25),
     bg="#fe9504",
     fg="white",
-    command=lambda: metmulti(),
+    command=lambda: addscreen("x"),
 )
 buttdiv = Button(
     numbers,
@@ -322,8 +296,9 @@ buttdiv = Button(
     font=("Arial", 25),
     bg="#fe9504",
     fg="white",
-    command=lambda: metdiv(),
+    command=lambda: addscreen("÷"),
 )
+
 buttclear = Button(
     numbers,
     text="AC",
@@ -334,10 +309,11 @@ buttclear = Button(
     fg="white",
     command=lambda: clear(),
 )
+
 buttresult = Button(
     numbers,
     text="=",
-    width=10,
+    width=5,
     height=2,
     font=("Arial", 25),
     bg="#333333",
@@ -352,7 +328,27 @@ buttdeci = Button(
     font=("Arial", 25),
     bg="#333333",
     fg="white",
-    command=lambda: adddeci(),
+    command=lambda: addscreen("."),
+)
+buttparent = Button(
+    numbers,
+    text="(",
+    width=5,
+    height=2,
+    font=("Arial", 25),
+    bg="#333333",
+    fg="white",
+    command=lambda: addscreen("("),
+)
+buttparent2 = Button(
+    numbers,
+    text=")",
+    width=5,
+    height=2,
+    font=("Arial", 25),
+    bg="#333333",
+    fg="white",
+    command=lambda: addscreen(")"),
 )
 
 butt0.grid(row=4, column=0, columnspan=2, sticky="We")
@@ -369,9 +365,22 @@ buttplus.grid(row=3, column=4)
 buttminus.grid(row=3, column=5)
 buttmulti.grid(row=2, column=4)
 buttdiv.grid(row=2, column=5)
-buttresult.grid(row=4, column=4, columnspan=2, sticky="We")
-buttclear.grid(row=1, column=4, columnspan=2, sticky="We")
+buttresult.grid(row=4, column=5)
+buttclear.grid(row=4, column=4)
 buttdeci.grid(row=4, column=2)
+buttparent.grid(row=1, column=4)
+buttparent2.grid(row=1, column=5)
+
+# bind system
+for i in range(10):
+    win.bind("%s" % (i), lambda Event, digit=i: addscreen(digit))
+win.bind("+", lambda Event: addscreen("+"))
+win.bind("-", lambda Event: addscreen("-"))
+win.bind("*", lambda Event: addscreen("x"))
+win.bind("/", lambda Event: addscreen("÷"))
+win.bind(".", lambda Event: addscreen("."))
+win.bind("<Return>", lambda Event: result())
+win.bind("<BackSpace>", lambda Event: delete())
 
 
 # start window
