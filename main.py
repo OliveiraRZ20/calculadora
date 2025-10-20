@@ -9,7 +9,7 @@ win_main = Tk()
 win_main.title("Calculadora-V4")
 win_main.resizable(False,False)
 win_main.configure(bg="black")
-win_main.iconbitmap(sys.executable)
+win_main.iconbitmap(default='calculator.ico')
 
 from functions import *
 
