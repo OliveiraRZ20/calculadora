@@ -19,14 +19,14 @@ centralizar_janela(win_main,524,750)
 visor_expressao = Frame(win_main,bg='green')
 visor_expressao.pack(side='top',anchor='nw')
 
-label_expressao = criar_label(visor_expressao,expressao)
+label_expressao = criar_label(visor_expressao,calculadora.expressao)
 label_expressao.pack()
 
 
 visor_resultado = Frame(win_main,bg='black')
 visor_resultado.pack(side='top',anchor='se')
 
-label_resultado = criar_label(visor_resultado,resultado)
+label_resultado = criar_label(visor_resultado,calculadora.resultado)
 label_resultado.pack(pady=100)
 # |==============================================================|
 teclado_numerico = Frame(win_main, bg='blue')
@@ -93,15 +93,13 @@ botao_divisao.grid(column=4,row=2)
 for i in range(10):
     win_main.bind(f"{i}", lambda Event, digito=i: calculadora.digitar(digito))
 
-operadores = ["+", "-",","]
-for i in operadores:
-    win_main.bind(f"{i}", lambda Event, digito=i: calculadora.digitar(digito))
-
+win_main.bind("+", lambda Event: calculadora.digitar("+"))
+win_main.bind("-", lambda Event: calculadora.digitar("-"))
 win_main.bind("*", lambda Event: calculadora.digitar("x"))
 win_main.bind("/", lambda Event: calculadora.digitar("÷"))
 win_main.bind(".", lambda Event: calculadora.digitar(","))
-win_main.bind("<Return>", lambda Event: calculadora.fazer_calculo())
-win_main.bind("<BackSpace>", lambda Event: calculadora.deletar_ultimo_digito())
+win_main.bind("<Return>", lambda Event: calculadora.calcular())
+win_main.bind("<BackSpace>", lambda Event: calculadora.deletar())
 
 # iniciar janela
 win_main.mainloop()
