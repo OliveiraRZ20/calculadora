@@ -22,7 +22,7 @@ posY = alturawin // 2 - int(altura) // 2
 win.geometry(f"+{posX}+{posY}")
 
 
-# window content
+# frame areas and location
 
 numbers = Frame(win)
 numbers.pack(side="bottom")
@@ -42,11 +42,30 @@ screen.pack(side="top")
 
 
 def addscreen(num):
-    global expnum, firstresult
+    global expnum, firstresult, firstnum
     if not firstresult:
-        expnum.append(str(num))
-        displayexpnum.config(text="".join(expnum))
-    if firstresult:
+        if ("".join(expnum)) == "" and num in ["+", "-", "x", "÷"]:
+            pass
+        else:
+            if firstnum:
+                expnum.append(str(num))
+                displayexpnum.config(text="".join(expnum))
+                firstnum = False
+            elif not firstnum:
+                if expnum == []:
+                    if num in ["+", "-", "x", "÷"]:
+                        pass
+                    else:
+                        expnum.append(str(num))
+                        displayexpnum.config(text="".join(expnum))
+                else:
+                    last_element = expnum[-1]
+                    if last_element in ["+", "-", "x", "÷"] and num in ["+", "-", "x", "÷"]:
+                        pass
+                    else:
+                        expnum.append(str(num))
+                        displayexpnum.config(text="".join(expnum))
+    elif firstresult:
         if num in [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, "(", ")"]:
             pass
         else:
@@ -59,38 +78,49 @@ def addscreen(num):
 def result():
     global expnum, displaynum, finalnum, memorynum, firstresult
     currentnum = str(("".join(expnum)))
-    currentnum = currentnum.replace("x", "*").replace("÷", "/")
-    displaynum.config(text=(round(eval(currentnum), 5)))
-    memorynum = displaynum.cget("text")
-    firstresult = True
+    if currentnum == "":
+        pass
+    else:
+        currentnum = currentnum.replace("x", "*").replace("÷", "/")
+        try:
+            result = round(eval(currentnum), 5)
+        except ZeroDivisionError:
+            displaynum.config(text=("Math Error..."))
+            firstresult = True
+        else:
+            displaynum.config(text=(result))
+            memorynum = displaynum.cget("text")
+            firstresult = True
 
 
 def clear():
-    global expnum, displayexpnum, finalnum, firstresult
+    global expnum, displayexpnum, firstresult, firstnum
     expnum = []
-    finalnum = 0
     displayexpnum.config(text="")
     displaynum.config(text=0)
     firstresult = False
+    firstnum = True
 
 
 def delete():
     global expnum, displayexpnum
-    last_element = expnum[-1]
-    expnum.remove(last_element)
-    displayexpnum.config(text="".join(expnum))
+    if firstresult:
+        pass
+    elif ("".join(expnum)) == "":
+        pass
+    else:
+        last_element = expnum.pop()
+        displayexpnum.config(text="".join(expnum))
 
 
 # screen number
 
-finalnum = 0
-
 expnum = []
-
 
 memorynum = 0
 
 firstresult = False
+firstnum = True
 
 
 # frame SCREEN_NUM
@@ -106,7 +136,7 @@ displayexpnum.pack()
 
 displaynum = Label(
     numscreen,
-    text=finalnum,
+    text=0,
     bg="black",
     fg="white",
     font=("Arial", 50),
@@ -127,7 +157,8 @@ butt0 = Button(
     command=lambda: addscreen(0),
 )
 
-"""
+
+# buttons 1 to 9
 def ButtonCreator(x, y):
     for i in range(x, y):
         name = "butt" + str(i)
@@ -144,101 +175,9 @@ def ButtonCreator(x, y):
 
 
 ButtonCreator(1, 10)
-"""
-
-butt1 = Button(
-    numbers,
-    text="1",
-    width=5,
-    height=2,
-    font=("Arial", 25),
-    bg="#333333",
-    fg="white",
-    command=lambda: addscreen(1),
-)
-butt2 = Button(
-    numbers,
-    text="2",
-    width=5,
-    height=2,
-    font=("Arial", 25),
-    bg="#333333",
-    fg="white",
-    command=lambda: addscreen(2),
-)
-butt3 = Button(
-    numbers,
-    text="3",
-    width=5,
-    height=2,
-    font=("Arial", 25),
-    bg="#333333",
-    fg="white",
-    command=lambda: addscreen(3),
-)
-butt4 = Button(
-    numbers,
-    text="4",
-    width=5,
-    height=2,
-    font=("Arial", 25),
-    bg="#333333",
-    fg="white",
-    command=lambda: addscreen(4),
-)
-butt5 = Button(
-    numbers,
-    text="5",
-    width=5,
-    height=2,
-    font=("Arial", 25),
-    bg="#333333",
-    fg="white",
-    command=lambda: addscreen(5),
-)
-butt6 = Button(
-    numbers,
-    text="6",
-    width=5,
-    height=2,
-    font=("Arial", 25),
-    bg="#333333",
-    fg="white",
-    command=lambda: addscreen(6),
-)
-butt7 = Button(
-    numbers,
-    text="7",
-    width=5,
-    height=2,
-    font=("Arial", 25),
-    bg="#333333",
-    fg="white",
-    command=lambda: addscreen(7),
-)
-butt8 = Button(
-    numbers,
-    text="8",
-    width=5,
-    height=2,
-    font=("Arial", 25),
-    bg="#333333",
-    fg="white",
-    command=lambda: addscreen(8),
-)
-butt9 = Button(
-    numbers,
-    text="9",
-    width=5,
-    height=2,
-    font=("Arial", 25),
-    bg="#333333",
-    fg="white",
-    command=lambda: addscreen(9),
-)
 
 
-"""
+# buttons (+ - * /)
 def ButtonCreatorlist(nums, names):
     for i, j in zip(nums, names):
         name = "butt" + str(j)
@@ -257,47 +196,7 @@ def ButtonCreatorlist(nums, names):
 simbs = ["+", "-", "x", "÷"]
 names = ["plus", "minus", "multi", "div"]
 ButtonCreatorlist(simbs, names)
-"""
-buttplus = Button(
-    numbers,
-    text="+",
-    width=5,
-    height=2,
-    font=("Arial", 25),
-    bg="#fe9504",
-    fg="white",
-    command=lambda: addscreen("+"),
-)
-buttminus = Button(
-    numbers,
-    text="-",
-    width=5,
-    height=2,
-    font=("Arial", 25),
-    bg="#fe9504",
-    fg="white",
-    command=lambda: addscreen("-"),
-)
-buttmulti = Button(
-    numbers,
-    text="x",
-    width=5,
-    height=2,
-    font=("Arial", 25),
-    bg="#fe9504",
-    fg="white",
-    command=lambda: addscreen("x"),
-)
-buttdiv = Button(
-    numbers,
-    text="÷",
-    width=5,
-    height=2,
-    font=("Arial", 25),
-    bg="#fe9504",
-    fg="white",
-    command=lambda: addscreen("÷"),
-)
+
 
 buttclear = Button(
     numbers,
@@ -351,6 +250,8 @@ buttparent2 = Button(
     command=lambda: addscreen(")"),
 )
 
+# coordlist =
+
 butt0.grid(row=4, column=0, columnspan=2, sticky="We")
 butt1.grid(row=3, column=0)
 butt2.grid(row=3, column=1)
@@ -361,19 +262,22 @@ butt6.grid(row=2, column=2)
 butt7.grid(row=1, column=0)
 butt8.grid(row=1, column=1)
 butt9.grid(row=1, column=2)
-buttplus.grid(row=3, column=4)
-buttminus.grid(row=3, column=5)
-buttmulti.grid(row=2, column=4)
-buttdiv.grid(row=2, column=5)
-buttresult.grid(row=4, column=5)
-buttclear.grid(row=4, column=4)
+buttplus.grid(row=3, column=3)
+buttminus.grid(row=3, column=4)
+buttmulti.grid(row=2, column=3)
+buttdiv.grid(row=2, column=4)
+buttresult.grid(row=4, column=4)
+buttclear.grid(row=4, column=3)
 buttdeci.grid(row=4, column=2)
-buttparent.grid(row=1, column=4)
-buttparent2.grid(row=1, column=5)
+buttparent.grid(row=1, column=3)
+buttparent2.grid(row=1, column=4)
+
 
 # bind system
 for i in range(10):
     win.bind("%s" % (i), lambda Event, digit=i: addscreen(digit))
+
+
 win.bind("+", lambda Event: addscreen("+"))
 win.bind("-", lambda Event: addscreen("-"))
 win.bind("*", lambda Event: addscreen("x"))
@@ -384,4 +288,5 @@ win.bind("<BackSpace>", lambda Event: delete())
 
 
 # start window
-win.mainloop()
+if __name__ == '__main__':
+    win.mainloop()
