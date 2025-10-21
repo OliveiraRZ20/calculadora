@@ -102,5 +102,5 @@ win_main.bind("<Return>", lambda Event: calculadora.calcular())
 win_main.bind("<BackSpace>", lambda Event: calculadora.deletar())
 
 # iniciar janela
-win_main.mainloop()
-
+if __name__ == "__main__":
+    win_main.mainloop()
